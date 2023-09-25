@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
+use App\Services\AuthUser;
 
 class UserController extends Controller
 {
+    protected $authUserService;
+
+    public function __construct(AuthUser $authUserService)
+    {
+        $this->authUserService = $authUserService;
+    }
+
     /**
      * Handles Registration Request
      *
@@ -29,24 +34,11 @@ class UserController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
+            return $this->authUserService->register($request);
 
-            $token = $user->createToken(
-                $user->name.'_'.Carbon::now(),
-                ['*'],
-                Carbon::now()->addHour()
-            )->plainTextToken;
-
-            return response()->json(['token' => $token], 201);
         } catch (\Throwable $th) {
-            $error = 'Bad request';
-
             return response()->json([
-                'error' =>  $error
+                'error' =>  'Bad request'
             ], 404);
         }
     }
@@ -66,27 +58,13 @@ class UserController extends Controller
             ];
 
             if (auth()->attempt($credentials)) {
-
-                $user = User::find(auth()->user()->id);
-
-                $user->tokens()->delete();
-
-                $token = $user->createToken(
-                            $user->name.'_'.Carbon::now(),
-                            ['*'],
-                            Carbon::now()->addHour()
-                        )->plainTextToken;
-
-                return response()->json(['token' => $token], 201);
+                return $this->authUserService->login();
             } else {
                 return response()->json(['error' => 'UnAuthorised'], 401);
             }
-
         } catch (\Throwable $th) {
-            $error = 'Bad request';
-
             return response()->json([
-                'error' =>  $error
+                'error' =>  'Bad request'
             ], 404);
         }
     }
