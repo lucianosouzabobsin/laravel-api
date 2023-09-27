@@ -17,5 +17,5 @@ yarn-error.log
 /.fleet
 /.idea
 .vscode
-/api/tests/Coverage
-api/reports
+/tests/Coverage
+/reports
