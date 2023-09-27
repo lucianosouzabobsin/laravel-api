@@ -36,10 +36,8 @@ class AuthUser
 
             return response()->json(['token' => $token], 201);
         } catch (\Throwable $th) {
-            $error = 'Bad request';
-
             return response()->json([
-                'error' =>  $error
+                'error' =>  'Bad request'
             ], 404);
         }
     }
