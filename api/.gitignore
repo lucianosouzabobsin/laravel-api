@@ -16,6 +16,6 @@ npm-debug.log
 yarn-error.log
 /.fleet
 /.idea
-/.vscode
-/tests/Coverage
-/reports
+.vscode
+api/tests/Coverage
+api/reports
