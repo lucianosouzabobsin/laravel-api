@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,4 +20,8 @@ Route::post('/login', [UserController::class, 'login']);
 
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('/user', [UserController::class, 'details']);
+    Route::get('/module-list', [ModuleController::class, 'list']);
+    Route::post('/module-create', [ModuleController::class, 'create']);
+    Route::post('/module-update', [ModuleController::class, 'update']);
+    Route::post('/module-active', [ModuleController::class, 'active']);
 });
