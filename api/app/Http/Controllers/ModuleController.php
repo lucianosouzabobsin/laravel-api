@@ -23,19 +23,9 @@ class ModuleController extends Controller
      */
     public function list()
     {
-        try {
+        $modules = $this->moduleService->getAll();
 
-            $modules = $this->moduleService->getAll();
-
-            return response()->json($modules, 201);
-        } catch (\Throwable $th) {
-            $error = 'Bad request';
-
-            return response()->json([
-                'error' => $error,
-                'description_error' => $th->getMessage()
-            ], 404);
-        }
+        return response()->json($modules, 201);
     }
 
     /**
@@ -46,29 +36,20 @@ class ModuleController extends Controller
      */
     public function create(Request $request)
     {
-        try {
-            $inputs = $request->all();
+        $inputs = $request->all();
 
-            $validator = Validator::make($inputs, [
-                'name' => 'required|string|max:30',
-                'description' => 'required|string|max:255',
-            ]);
+        $validator = Validator::make($inputs, [
+            'name' => 'required|string|unique:modules|max:30',
+            'description' => 'required|string|max:255',
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
-
-            $module = $this->moduleService->make($inputs);
-
-            return response()->json($module, 201);
-        } catch (\Throwable $th) {
-            $error = 'Bad request';
-
-            return response()->json([
-                'error' => $error,
-                'description_error' => $th->getMessage()
-            ], 404);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
+
+        $module = $this->moduleService->make($inputs);
+
+        return response()->json($module, 201);
     }
 
     /**
@@ -79,31 +60,22 @@ class ModuleController extends Controller
      */
     public function update(Request $request)
     {
-        try {
-            $inputs = $request->all();
+        $inputs = $request->all();
 
-            $validator = Validator::make($inputs, [
-                'id' => ['required'],
-                'name' => 'required|string|max:30',
-                'description' => 'required|string|max:255',
-                'active' => 'required|boolean',
-            ]);
+        $validator = Validator::make($inputs, [
+            'id' => ['required'],
+            'name' => 'required|string|max:30|unique:modules,name,'.$inputs['id'],
+            'description' => 'required|string|max:255',
+            'active' => 'required|boolean',
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
-
-            $module = $this->moduleService->update($inputs);
-
-            return response()->json($module, 201);
-        } catch (\Throwable $th) {
-            $error = 'Bad request';
-
-            return response()->json([
-                'error' => $error,
-                'description_error' => $th->getMessage()
-            ], 404);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
+
+        $module = $this->moduleService->update($inputs);
+
+        return response()->json($module, 201);
     }
 
     /**
