@@ -147,6 +147,39 @@ class UserControllerTest extends TestCase
         $this->assertEquals($expected, $jsonData);
     }
 
+    /**
+     * Testa o registro para um erro 404, campos informados errados.
+     *
+     * @return void
+     */
+    public function testRegisterUserFieldsWrong()
+    {
+        $response = $this->postJson('/api/register', [
+            'campoerrado' => 'Test User',
+            'campoerrado2' => 'test@example.com',
+            'campoerrado3' => 'password123',
+        ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'errors' => [
+                'name' => [
+                    "The name field is required."
+                ],
+                'email' => [
+                    "The email field is required."
+                ],
+                'password' => [
+                    "The password field is required."
+                ]
+            ]
+        ];
+
+        $response->assertStatus(422);
+        $this->assertEquals($expected, $jsonData);
+    }
+
 
     /**
      * Testa o login de um usuário existente.
