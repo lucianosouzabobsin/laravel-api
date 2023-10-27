@@ -40,7 +40,12 @@ class ModuleController extends Controller
         $inputs = $request->all();
 
         $validator = Validator::make($inputs, [
-            'name' => ['required', 'string', 'max:30',  new ModuleExists($request->all(), $this->moduleService)],
+            'name' => [
+                'required',
+                'string',
+                'max:30',
+                new ModuleExists($request->all(), $this->moduleService)
+            ],
             'description' => ['required', 'string', 'max:255'],
         ]);
 
