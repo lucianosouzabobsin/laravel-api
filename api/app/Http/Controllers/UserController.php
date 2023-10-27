@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Rules\UserExists;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\AuthUser;
@@ -24,9 +25,14 @@ class UserController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users|max:255',
-            'password' => 'required|string|min:8',
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'string',
+                'max:255',
+                new UserExists($request->all(), $this->authUserService)
+            ],
+            'password' => ['required', 'string', 'min:8'],
         ]);
 
         if ($validator->fails()) {
