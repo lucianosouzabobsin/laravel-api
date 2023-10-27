@@ -25,21 +25,15 @@ class AuthUser
      */
     public function register(Request $request)
     {
-        try {
-            $user = $this->userRepository->make([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
+        $user = $this->userRepository->make([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
 
-            $token = $this->createToken($user);
+        $token = $this->createToken($user);
 
-            return response()->json(['token' => $token], 201);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'error' =>  'Bad request'
-            ], 404);
-        }
+        return response()->json(['token' => $token], 201);
     }
 
     /**
