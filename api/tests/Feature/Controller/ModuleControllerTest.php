@@ -2,35 +2,43 @@
 
 namespace Tests\Feature\Controller;
 
-use App\Models\Module;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Utils\TestSetup;
 
 class ModuleControllerTest extends TestCase
 {
-    protected $module;
     protected $token;
+    protected $testSetup;
 
-   use RefreshDatabase;
-
-    public function setUp() : void
-    {
+    public function setUp() : void {
         parent::setUp();
 
-        // Cria um novo módulo diretamente no banco de dados de teste
-        $this->module = Module::create([
-            'name' => 'Teste',
-            'description' => 'Descrição do teste',
-            'active' => true,
+        $this->testSetup = new TestSetup();
+        $this->testSetup->setUp();
+
+        $login = $this->postJson('/api/login', [
+            'email' => 'usuario1@test.com',
+            'password' => 'password',
         ]);
 
-        $register = $this->postJson('/api/register', [
-            'name' => 'Jane Doe',
-            'email' => 'jane.doe@example.com',
-            'password' => 'password456',
-        ]);
+        $this->token = $login['token'];
+    }
 
-        $this->token = $register['token'];
+    /**
+     * Testa a list de módulos.
+     *
+     * @return void
+     */
+    public function testListModule()
+    {
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->token,
+        ])->getJson('/api/module-list');
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $size = count($jsonData);
+        $this->assertEquals($size, 7);
     }
 
     /**
@@ -44,18 +52,20 @@ class ModuleControllerTest extends TestCase
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/module-create', [
-                'name' => 'Teste2',
+                'name' => 'Teste8',
                 'description' => 'Descrição do teste 2',
                 'active' => true,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
-        $this->assertEquals('Teste2', $jsonData['name']);
+
+        $this->assertEquals('Teste8', $jsonData['name']);
         $this->assertEquals('Descrição do teste 2', $jsonData['description']);
         $this->assertEquals('1', $jsonData['active']);
     }
 
     /**
+     * Testa o registro de um novo módulo ja existente retornando erro.
      *
      * @return void
      */
@@ -65,7 +75,7 @@ class ModuleControllerTest extends TestCase
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/module-create', [
-                'name' => 'Teste',
+                'name' => 'Module 1',
                 'description' => 'Descrição do teste 3',
                 'active' => true,
             ]);
@@ -83,34 +93,6 @@ class ModuleControllerTest extends TestCase
         $this->assertEquals($expected, $jsonData);
     }
 
-    /**
-     * Testa a list de módulos.
-     *
-     * @return void
-     */
-    public function testListModule()
-    {
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->token,
-        ])->getJson('/api/module-list');
-
-        $jsonData = json_decode($response->getContent(), true);
-
-        // Obter o ID do módulo criado
-        $module = Module::where('name', 'Teste')->first();
-        $id = $module->id;
-
-        $expected = [
-            [
-                'id' => $id,
-                'name' => 'Teste',
-                'description' => 'Descrição do teste',
-                'active' => true,
-            ],
-        ];
-
-        $this->assertEquals($expected, $jsonData);
-    }
 
     /**
      * Testa o update de um módulo.
@@ -119,15 +101,11 @@ class ModuleControllerTest extends TestCase
      */
     public function testUpdateModule()
     {
-        // Obter o ID do módulo criado
-        $module = Module::where('name', 'Teste')->first();
-        $id = $module->id;
-
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/module-update', [
-                'id' => $id,
+                'id' => 1,
                 'name' => 'Teste Alterado',
                 'description' => 'Descrição do teste',
                 'active' => false,
@@ -138,8 +116,9 @@ class ModuleControllerTest extends TestCase
         $this->assertEquals('Teste Alterado', $jsonData['name']);
         $this->assertEquals('Descrição do teste', $jsonData['description']);
         $this->assertEquals('0', $jsonData['active']);
-        $this->assertEquals($id, $jsonData['id']);
+        $this->assertEquals('1', $jsonData['id']);
     }
+
 
     /**
      * Testa o update de um módulo ja existente em outra chave.
@@ -148,27 +127,12 @@ class ModuleControllerTest extends TestCase
      */
     public function testErrorUpdateModuleAnotherAlreadyExists()
     {
-        // Cria um teste 2
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->token,
-            ])
-            ->postJson('/api/module-create', [
-                'name' => 'Teste2',
-                'description' => 'Descrição do teste 2',
-                'active' => true,
-            ]);
-
-
-        // Obter o ID do módulo criado
-        $module = Module::where('name', 'Teste')->first();
-        $id = $module->id;
-
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/module-update', [
-                'id' => $id,
-                'name' => 'Teste2',
+                'id' => 2,
+                'name' => 'Module 6',
                 'description' => 'Descrição do teste',
                 'active' => false,
             ]);
@@ -193,35 +157,31 @@ class ModuleControllerTest extends TestCase
      */
     public function testActiveInactive()
     {
-        // Obter o ID do módulo criado
-        $module = Module::where('name', 'Teste')->first();
-        $id = $module->id;
-
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/module-active', [
-                'id' => $id
+                'id' => '1'
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
         //Inativar
         $this->assertEquals('0', $jsonData['active']);
-        $this->assertEquals($id, $jsonData['id']);
+        $this->assertEquals('1', $jsonData['id']);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/module-active', [
-                'id' => $id
+                'id' => '1'
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
         //Ativar
         $this->assertEquals('1', $jsonData['active']);
-        $this->assertEquals($id, $jsonData['id']);
+        $this->assertEquals('1', $jsonData['id']);
     }
 
     /**
@@ -253,7 +213,7 @@ class ModuleControllerTest extends TestCase
      *
      * @return void
      */
-    public function testNullIdActiveInactive()
+    public function testIdNullActiveInactive()
     {
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,

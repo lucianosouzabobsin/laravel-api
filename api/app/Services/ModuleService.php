@@ -52,4 +52,14 @@ class ModuleService
     {
         return $this->moduleRepository->active($id);
     }
+
+    /**
+     * Verifica se ja existe o módulo
+     *
+     * @return array
+    */
+    public function exists(int $id, string $name)
+    {
+        return $this->moduleRepository->exists($id, $name);
+    }
 }

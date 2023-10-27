@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Rules\ModuleExists;
 use App\Services\ModuleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -39,8 +40,13 @@ class ModuleController extends Controller
         $inputs = $request->all();
 
         $validator = Validator::make($inputs, [
-            'name' => 'required|string|unique:modules|max:30',
-            'description' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'max:30',
+                new ModuleExists($request->all(), $this->moduleService)
+            ],
+            'description' => ['required', 'string', 'max:255'],
         ]);
 
         if ($validator->fails()) {
@@ -64,7 +70,12 @@ class ModuleController extends Controller
 
         $validator = Validator::make($inputs, [
             'id' => ['required'],
-            'name' => 'required|string|max:30|unique:modules,name,'.$inputs['id'],
+            'name' => [
+                'required',
+                'string',
+                'max:30',
+                new ModuleExists($request->all(), $this->moduleService)
+            ],
             'description' => 'required|string|max:255',
             'active' => 'required|boolean',
         ]);

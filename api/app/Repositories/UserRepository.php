@@ -34,4 +34,14 @@ class UserRepository implements UserRepositoryInterface
     {
         return $this->entity::find(auth()->user()->id);
     }
+
+    /**
+     * Verifica se ja existe o email
+     *
+     * @return array
+    */
+    public function exists(int $id, string $email)
+    {
+        return $this->entity->where('id', '!=', $id)->where('email', $email)->first();
+    }
 }
