@@ -68,4 +68,14 @@ class ModuleRepository implements ModuleRepositoryInterface
 
         return $module;
     }
+
+    /**
+     * Verifica se ja existe o módulo
+     *
+     * @return array
+    */
+    public function exists(int $id, string $name)
+    {
+        return $this->entity->where('id', '!=', $id)->where('name', $name)->first();
+    }
 }

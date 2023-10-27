@@ -58,6 +58,16 @@ class AuthUser
     }
 
     /**
+     * Verifica se ja existe o módulo
+     *
+     * @return array
+    */
+    public function exists(int $id, string $email)
+    {
+        return $this->userRepository->exists($id, $email);
+    }
+
+    /**
      * Create Token
      *
      * @param User $user

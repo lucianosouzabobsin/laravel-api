@@ -2,12 +2,27 @@
 
 namespace Tests\Feature\Controller;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Utils\TestSetup;
 
 class UserControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    protected $token;
+    protected $testSetup;
+
+    public function setUp() : void {
+        parent::setUp();
+
+        $this->testSetup = new TestSetup();
+        $this->testSetup->setUp();
+
+        $login = $this->postJson('/api/login', [
+            'email' => 'usuario1@test.com',
+            'password' => 'password',
+        ]);
+
+        $this->token = $login['token'];
+    }
 
     /**
      * Testa o registro de um novo usuário.
@@ -17,8 +32,8 @@ class UserControllerTest extends TestCase
     public function testRegisterUser()
     {
         $response = $this->postJson('/api/register', [
-            'name' => 'John Doe',
-            'email' => 'john.doe@example.com',
+            'name' => 'Usuario 4',
+            'email' => 'usuario4@test.com',
             'password' => 'password123',
         ]);
 
@@ -26,70 +41,110 @@ class UserControllerTest extends TestCase
     }
 
     /**
-     * Testa o registro de um novo usuário.
+     * Testa endpoint sem nome.
      *
      * @return void
      */
     public function testRegisterUserErrorValidatorNoName()
     {
         $response = $this->postJson('/api/register', [
-            'email' => 'john.doe@example.com',
+            'email' => 'usuario5@test.com',
             'password' => 'password123',
         ]);
 
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'errors' => [
+                'name' => [
+                    "The name field is required."
+                ]
+            ]
+        ];
+
         $response->assertStatus(422);
+        $this->assertEquals($expected, $jsonData);
     }
 
     /**
-     * Testa o registro de um novo usuário.
+     * Testa endpoint sem senha.
      *
      * @return void
      */
     public function testRegisterUserErrorValidatorNoPassword()
     {
         $response = $this->postJson('/api/register', [
-            'email' => 'john.doe@example.com',
+            'name' => 'Usuario 5',
+            'email' => 'usuario5@test.com',
             'password' => '',
         ]);
 
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'errors' => [
+                'password' => [
+                    "The password field is required."
+                ]
+            ]
+        ];
+
         $response->assertStatus(422);
+        $this->assertEquals($expected, $jsonData);
     }
 
     /**
-     * Testa o registro de um novo usuário.
+     * Testa endpoint sem o minimo de 8 caracteres para senha.
      *
      * @return void
      */
     public function testRegisterUserErrorValidatorBelowStringMinimumPassword()
     {
         $response = $this->postJson('/api/register', [
-            'email' => 'john.doe@example.com',
+            'name' => 'Usuario 5',
+            'email' => 'usuario5@test.com',
             'password' => '1234567',
         ]);
 
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'errors' => [
+                'password' => [
+                    "The password field must be at least 8 characters."
+                ]
+            ]
+        ];
+
         $response->assertStatus(422);
+        $this->assertEquals($expected, $jsonData);
     }
 
     /**
-     * Testa o registro de um novo usuário.
+     * Testa endpoint com tentiva de fazer registro com email já existente
      *
      * @return void
      */
     public function testRegisterUserErrorValidatorUniqueEmail()
     {
         $response = $this->postJson('/api/register', [
-            'name' => 'John Doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'password123',
-        ]);
-
-        $response = $this->postJson('/api/register', [
-            'name' => 'John Doe 2',
-            'email' => 'john.doe@example.com',
+            'name' => 'usuario 3 repet',
+            'email' => 'usuario3@test.com',
             'password' => 'password1234666',
         ]);
 
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'errors' => [
+                'email' => [
+                    "The e-mail has already been taken."
+                ]
+            ]
+        ];
+
         $response->assertStatus(422);
+        $this->assertEquals($expected, $jsonData);
     }
 
 
@@ -100,15 +155,9 @@ class UserControllerTest extends TestCase
      */
     public function testLoginUser()
     {
-        $response = $this->postJson('/api/register', [
-            'name' => 'Jane Doe',
-            'email' => 'jane.doe@example.com',
-            'password' => 'password456',
-        ]);
-
         $response = $this->postJson('/api/login', [
-            'email' => 'jane.doe@example.com',
-            'password' => 'password456',
+            'email' => 'usuario3@test.com',
+            'password' => 'password',
         ]);
 
         $response->assertStatus(201);
@@ -121,15 +170,9 @@ class UserControllerTest extends TestCase
      */
     public function testLoginUserUnauthorised()
     {
-        $response = $this->postJson('/api/register', [
-            'name' => 'Jane Doe',
-            'email' => 'jane.doe@example.com',
-            'password' => 'password456',
-        ]);
-
         $response = $this->postJson('/api/login', [
-            'email' => 'jane.doe@example.com',
-            'password' => 'password456qqq',
+            'email' => 'usuario3@test.com',
+            'password' => 'passwordwrong',
         ]);
 
         $response->assertStatus(401);
@@ -142,18 +185,23 @@ class UserControllerTest extends TestCase
      */
     public function testUserDetails()
     {
-        $register = $this->postJson('/api/register', [
-            'name' => 'Jane Doe',
-            'email' => 'jane.doe@example.com',
-            'password' => 'password456',
-        ]);
-
-        $token = $register['token'];
-
         $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer ' . $this->token,
         ])->getJson('/api/user');
 
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'user' => [
+                'id' => 1,
+                'name' => 'Usuario 1',
+                'email' => 'usuario1@test.com',
+                'created_at' => null,
+                'updated_at' => null
+            ]
+        ];
+
         $response->assertStatus(200);
+        $this->assertEquals($expected, $jsonData);
     }
 }
