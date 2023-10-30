@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
-interface ModuleRepositoryInterface
+interface UserGroupRepositoryInterface
 {
     public function make(array $data);
     public function update(array $data);

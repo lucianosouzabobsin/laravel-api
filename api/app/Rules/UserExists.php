@@ -31,7 +31,7 @@ class UserExists implements Rule
      */
     public function passes($attribute, $value)
     {
-        $id = isset($this->request['id'])??null;
+        $id = isset($this->request['id'])?$this->request['id']:null;
         $email = $this->request['email'];
 
         return $this->authUserService->exists($id, $email) == false;
