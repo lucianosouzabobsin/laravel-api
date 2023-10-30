@@ -2,23 +2,23 @@
 
 namespace App\Rules;
 
-use App\Services\ModuleService;
+use App\Services\UserGroupService;
 use Illuminate\Contracts\Validation\Rule;
 
-class ModuleExists implements Rule
+class UserGroupExists implements Rule
 {
     private $request;
-    protected $moduleService;
+    protected $userGroupService;
 
     /**
      * Create a new rule instance.
      *
      * @return void
      */
-    public function __construct($request, ModuleService $moduleService)
+    public function __construct($request, UserGroupService $userGroupService)
     {
         $this->request = $request;
-        $this->moduleService = $moduleService;
+        $this->userGroupService = $userGroupService;
     }
 
 
@@ -34,7 +34,7 @@ class ModuleExists implements Rule
         $id = isset($this->request['id'])?$this->request['id']:null;
         $name = $this->request['name'];
 
-        return $this->moduleService->exists($id, $name) == false;
+        return $this->userGroupService->exists($id, $name) == false;
     }
 
     /**

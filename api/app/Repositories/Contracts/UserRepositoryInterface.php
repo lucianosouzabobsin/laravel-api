@@ -6,5 +6,5 @@ interface UserRepositoryInterface
 {
     public function make(array $data);
     public function findUserAuth();
-    public function exists(int $id, string $email);
+    public function exists(?int $id, string $email);
 }

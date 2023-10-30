@@ -34,10 +34,14 @@ class TestSetup
         $this->db->statement($importSql);
         $importSql = file_get_contents($resourcesDirectory. '/database/dump_modules.sql');
         $this->db->statement($importSql);
+        $importSql = file_get_contents($resourcesDirectory. '/database/dump_users_groups.sql');
+        $this->db->statement($importSql);
 
         $importSql = file_get_contents($resourcesDirectory. '/User/inject_users.sql');
         $this->db->statement($importSql);
         $importSql = file_get_contents($resourcesDirectory. '/Module/inject_modules.sql');
+        $this->db->statement($importSql);
+        $importSql = file_get_contents($resourcesDirectory. '/UserGroup/inject_users_groups.sql');
         $this->db->statement($importSql);
     }
 }

@@ -56,7 +56,7 @@ class AuthUser
      *
      * @return array
     */
-    public function exists(int $id, string $email)
+    public function exists(?int $id, string $email)
     {
         return $this->userRepository->exists($id, $email);
     }
