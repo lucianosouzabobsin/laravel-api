@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Repositories\Contracts\ModuleRepositoryInterface;
+use App\Repositories\Contracts\UserGroupRepositoryInterface;
 
-class ModuleService
+class UserGroupService
 {
-    protected $moduleRepository;
+    protected $userGroupRepository;
 
-    public function __construct(ModuleRepositoryInterface $moduleRepository)
+    public function __construct(UserGroupRepositoryInterface $userGroupRepository)
     {
-        $this->moduleRepository = $moduleRepository;
+        $this->userGroupRepository = $userGroupRepository;
     }
 
     /**
@@ -20,7 +20,7 @@ class ModuleService
     */
     public function getAll()
     {
-        return $this->moduleRepository->getAll();
+        return $this->userGroupRepository->getAll();
     }
 
     /**
@@ -30,7 +30,7 @@ class ModuleService
     */
     public function make(array $data)
     {
-        return $this->moduleRepository->make($data);
+        return $this->userGroupRepository->make($data);
     }
 
     /**
@@ -40,7 +40,7 @@ class ModuleService
     */
     public function update(array $data)
     {
-        return $this->moduleRepository->update($data);
+        return $this->userGroupRepository->update($data);
     }
 
     /**
@@ -50,16 +50,16 @@ class ModuleService
     */
     public function active(int $id)
     {
-        return $this->moduleRepository->active($id);
+        return $this->userGroupRepository->active($id);
     }
 
     /**
-     * Verifica se ja existe o módulo
+     * Verifica se ja existe
      *
      * @return array
     */
     public function exists(?int $id, string $name)
     {
-        return $this->moduleRepository->exists($id, $name);
+        return $this->userGroupRepository->exists($id, $name);
     }
 }

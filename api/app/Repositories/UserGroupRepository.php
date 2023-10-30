@@ -2,17 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\ModuleRepositoryInterface;
-use App\Models\Module;
+use App\Repositories\Contracts\UserGroupRepositoryInterface;
+use App\Models\UserGroup;
 
-
-class ModuleRepository implements ModuleRepositoryInterface
+class UserGroupRepository implements UserGroupRepositoryInterface
 {
     protected $entity;
 
-    public function __construct(Module $module)
+    public function __construct(UserGroup $entity)
     {
-        $this->entity = $module;
+        $this->entity = $entity;
     }
 
     /**
@@ -27,21 +26,21 @@ class ModuleRepository implements ModuleRepositoryInterface
     }
 
     /**
-     * Update module
+     * Update entity
      * @param array $data
      *
      * @return array
      */
     public function update(array $data)
     {
-        $module = $this->entity->find($data['id']);
+        $entity = $this->entity->find($data['id']);
 
-        $module->name = $data['name'];
-        $module->description = $data['description'];
-        $module->active = $data['active'];
-        $module->save();
+        $entity->name = $data['name'];
+        $entity->description = $data['description'];
+        $entity->active = $data['active'];
+        $entity->save();
 
-        return $module;
+        return $entity;
     }
 
     /**
@@ -62,11 +61,11 @@ class ModuleRepository implements ModuleRepositoryInterface
      */
     public function active(int $id)
     {
-        $module = $this->entity->find($id);
-        $module->active = (int) !$module->active;
-        $module->save();
+        $entity = $this->entity->find($id);
+        $entity->active = (int) !$entity->active;
+        $entity->save();
 
-        return $module;
+        return $entity;
     }
 
     /**
