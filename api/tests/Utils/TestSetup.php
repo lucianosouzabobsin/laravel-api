@@ -28,20 +28,24 @@ class TestSetup
 
         $resourcesDirectory = dirname(__DIR__). '/Resources';
 
-        $importSql = file_get_contents($resourcesDirectory. '/database/dump_users.sql');
+        $importSql = file_get_contents($resourcesDirectory. '/database/tables/dump_users.sql');
         $this->db->statement($importSql);
-        $importSql = file_get_contents($resourcesDirectory. '/database/dump_personal_access_tokens.sql');
+        $importSql = file_get_contents($resourcesDirectory. '/database/tables/dump_personal_access_tokens.sql');
         $this->db->statement($importSql);
-        $importSql = file_get_contents($resourcesDirectory. '/database/dump_modules.sql');
+        $importSql = file_get_contents($resourcesDirectory. '/database/tables/dump_modules.sql');
         $this->db->statement($importSql);
-        $importSql = file_get_contents($resourcesDirectory. '/database/dump_users_groups.sql');
+        $importSql = file_get_contents($resourcesDirectory. '/database/tables/dump_users_groups.sql');
+        $this->db->statement($importSql);
+        $importSql = file_get_contents($resourcesDirectory. '/database/tables/dump_modules_actions.sql');
         $this->db->statement($importSql);
 
-        $importSql = file_get_contents($resourcesDirectory. '/User/inject_users.sql');
+        $importSql = file_get_contents($resourcesDirectory. '/database/data/inject_users.sql');
         $this->db->statement($importSql);
-        $importSql = file_get_contents($resourcesDirectory. '/Module/inject_modules.sql');
+        $importSql = file_get_contents($resourcesDirectory. '/database/data/inject_modules.sql');
         $this->db->statement($importSql);
-        $importSql = file_get_contents($resourcesDirectory. '/UserGroup/inject_users_groups.sql');
+        $importSql = file_get_contents($resourcesDirectory. '/database/data/inject_users_groups.sql');
+        $this->db->statement($importSql);
+        $importSql = file_get_contents($resourcesDirectory. '/database/data/inject_modules_actions.sql');
         $this->db->statement($importSql);
     }
 }
