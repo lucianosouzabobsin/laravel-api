@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ModuleActionController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserGroupController;
@@ -26,6 +27,11 @@ Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('/module-create', [ModuleController::class, 'create']);
     Route::post('/module-update', [ModuleController::class, 'update']);
     Route::post('/module-active', [ModuleController::class, 'active']);
+
+    Route::get('/module-action-list', [ModuleActionController::class, 'list']);
+    Route::post('/module-action-create', [ModuleActionController::class, 'create']);
+    Route::post('/module-action-update', [ModuleActionController::class, 'update']);
+    Route::post('/module-action-active', [ModuleActionController::class, 'active']);
 
     Route::get('/user-group-list', [UserGroupController::class, 'list']);
     Route::post('/user-group-create', [UserGroupController::class, 'create']);
