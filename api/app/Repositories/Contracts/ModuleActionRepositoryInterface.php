@@ -9,5 +9,5 @@ interface ModuleActionRepositoryInterface
     public function getAll();
     public function active(int $id);
     public function exists(?int $id, string $name);
-
+    public function findBy(array $filters);
 }

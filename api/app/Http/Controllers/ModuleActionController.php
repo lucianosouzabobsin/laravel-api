@@ -45,7 +45,7 @@ class ModuleActionController extends Controller
                 'string',
                 'max:30',
                 'regex:/^[a-z]+$/',
-                new ModuleActionExists($request->all(), $this->moduleActionService)
+                new ModuleActionExists($inputs, $this->moduleActionService)
             ],
         ]);
 
@@ -75,7 +75,7 @@ class ModuleActionController extends Controller
                 'string',
                 'max:30',
                 'regex:/^[a-z]+$/',
-                new ModuleActionExists($request->all(), $this->moduleActionService)
+                new ModuleActionExists($inputs, $this->moduleActionService)
             ],
             'active' => 'required|boolean',
         ]);

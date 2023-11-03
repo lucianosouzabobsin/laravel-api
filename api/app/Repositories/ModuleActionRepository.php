@@ -76,4 +76,28 @@ class ModuleActionRepository implements ModuleActionRepositoryInterface
     {
         return $this->entity->where('id', '!=', $id)->where('action', $action)->first();
     }
+
+    /**
+     * Consulta por campos
+     *
+     * Exemplo de uso do filter
+     * $filters = [
+     *   ['idade', '>', 25],
+     *   ['cidade', '=', 'São Paulo'],
+     * ];
+     *
+     * @return array
+    */
+    public function findBy(array $filters)
+    {
+        $query = $this->entity->query();
+
+        foreach ($filters as $filter) {
+            list($field, $operator, $value) = $filter;
+
+            $query->where($field, $operator, $value);
+        }
+
+        return $query->first();
+    }
 }
