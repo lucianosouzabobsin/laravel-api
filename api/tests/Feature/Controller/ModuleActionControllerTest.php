@@ -38,7 +38,7 @@ class ModuleActionControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $size = count($jsonData);
-        $this->assertEquals($size, 4);
+        $this->assertEquals($size, 5);
     }
 
     /**
