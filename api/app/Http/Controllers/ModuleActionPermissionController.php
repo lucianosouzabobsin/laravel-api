@@ -2,31 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Rules\UserGroupExists;
-use App\Services\UserGroupService;
+use App\Rules\ModuleActionPermissionRules;
+use App\Services\ModuleActionPermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class UserGroupController extends Controller
+class ModuleActionPermissionController extends Controller
 {
-    protected $userGroupService;
+    protected $moduleActionPermissionService;
 
-    public function __construct(UserGroupService $userGroupService)
+    public function __construct(ModuleActionPermissionService $moduleActionPermissionService)
     {
-        $this->userGroupService = $userGroupService;
+        $this->moduleActionPermissionService = $moduleActionPermissionService;
     }
 
 
     /**
-     * Return list Users Groups
+     * Return list ModulesActions
      *
      * @return \Illuminate\Http\JsonResponse
      */
     public function list()
     {
-        $modules = $this->userGroupService->getAll();
+        $moduleActionPermission = $this->moduleActionPermissionService->getAll();
 
-        return response()->json($modules, 201);
+        return response()->json($moduleActionPermission, 201);
     }
 
     /**
@@ -38,24 +38,27 @@ class UserGroupController extends Controller
     public function create(Request $request)
     {
         $inputs = $request->all();
+        $inputs['name'] = $this->moduleActionPermissionService->getName($inputs);
 
         $validator = Validator::make($inputs, [
+            'module_id' => ['required'],
+            'module_action_id' => ['required'],
             'name' => [
                 'required',
                 'string',
-                'max:30',
-                new UserGroupExists($inputs, $this->userGroupService)
+                new ModuleActionPermissionRules($inputs, $this->moduleActionPermissionService)
             ],
-            'description' => ['required', 'string', 'max:255'],
+            'description' => 'required|string|max:255',
+            'link' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $module = $this->userGroupService->make($inputs);
+        $moduleActionPermission = $this->moduleActionPermissionService->make($inputs);
 
-        return response()->json($module, 201);
+        return response()->json($moduleActionPermission, 201);
     }
 
     /**
@@ -70,13 +73,8 @@ class UserGroupController extends Controller
 
         $validator = Validator::make($inputs, [
             'id' => ['required'],
-            'name' => [
-                'required',
-                'string',
-                'max:30',
-                new UserGroupExists($inputs, $this->userGroupService)
-            ],
             'description' => 'required|string|max:255',
+            'link' => 'required|string|max:255',
             'active' => 'required|boolean',
         ]);
 
@@ -84,9 +82,9 @@ class UserGroupController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $module = $this->userGroupService->update($inputs);
+        $moduleActionPermission = $this->moduleActionPermissionService->update($inputs);
 
-        return response()->json($module, 201);
+        return response()->json($moduleActionPermission, 201);
     }
 
     /**
@@ -108,9 +106,9 @@ class UserGroupController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            $module = $this->userGroupService->active($inputs['id']);
+            $moduleActionPermission = $this->moduleActionPermissionService->active($inputs['id']);
 
-            return response()->json($module, 201);
+            return response()->json($moduleActionPermission, 201);
         } catch (\Throwable $th) {
             $error = 'Bad request';
 

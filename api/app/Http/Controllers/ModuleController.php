@@ -44,7 +44,13 @@ class ModuleController extends Controller
                 'required',
                 'string',
                 'max:30',
-                new ModuleExists($request->all(), $this->moduleService)
+                'regex:/^[a-z]+$/',
+                new ModuleExists($inputs, $this->moduleService)
+            ],
+            'nickname' => [
+                'required',
+                'string',
+                'max:30'
             ],
             'description' => ['required', 'string', 'max:255'],
         ]);
@@ -74,7 +80,13 @@ class ModuleController extends Controller
                 'required',
                 'string',
                 'max:30',
-                new ModuleExists($request->all(), $this->moduleService)
+                'regex:/^[a-z]+$/',
+                new ModuleExists($inputs, $this->moduleService)
+            ],
+            'nickname' => [
+                'required',
+                'string',
+                'max:30'
             ],
             'description' => 'required|string|max:255',
             'active' => 'required|boolean',

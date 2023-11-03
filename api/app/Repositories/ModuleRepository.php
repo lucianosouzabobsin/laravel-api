@@ -37,6 +37,7 @@ class ModuleRepository implements ModuleRepositoryInterface
         $module = $this->entity->find($data['id']);
 
         $module->name = $data['name'];
+        $module->nickname = $data['nickname'];
         $module->description = $data['description'];
         $module->active = $data['active'];
         $module->save();
@@ -77,5 +78,30 @@ class ModuleRepository implements ModuleRepositoryInterface
     public function exists(?int $id, string $name)
     {
         return $this->entity->where('id', '!=', $id)->where('name', $name)->first();
+    }
+
+
+    /**
+     * Consulta por campos
+     *
+     * Exemplo de uso do filter
+     * $filters = [
+     *   ['idade', '>', 25],
+     *   ['cidade', '=', 'São Paulo'],
+     * ];
+     *
+     * @return array
+    */
+    public function findBy(array $filters)
+    {
+        $query = $this->entity->query();
+
+        foreach ($filters as $filter) {
+            list($field, $operator, $value) = $filter;
+
+            $query->where($field, $operator, $value);
+        }
+
+        return $query->first();
     }
 }

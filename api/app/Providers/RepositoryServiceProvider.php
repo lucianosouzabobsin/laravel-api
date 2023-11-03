@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 use App\Repositories\Contracts\{
+    ModuleActionPermissionRepositoryInterface,
     ModuleActionRepositoryInterface,
     UserRepositoryInterface,
     ModuleRepositoryInterface,
     UserGroupRepositoryInterface
 };
 use App\Repositories\{
+    ModuleActionPermissionRepository,
     ModuleActionRepository,
     UserRepository,
     ModuleRepository,
@@ -42,6 +44,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             ModuleActionRepositoryInterface::class,
             ModuleActionRepository::class
+        );
+
+        $this->app->bind(
+            ModuleActionPermissionRepositoryInterface::class,
+            ModuleActionPermissionRepository::class
         );
     }
 
