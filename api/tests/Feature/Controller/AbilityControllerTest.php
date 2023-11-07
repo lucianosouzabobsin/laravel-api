@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Tests\Utils\TestSetup;
 use Illuminate\Support\Str;
 
-class ModuleActionPermissionControllerTest extends TestCase
+class AbilityControllerTest extends TestCase
 {
     protected $token;
     protected $testSetup;
@@ -30,65 +30,60 @@ class ModuleActionPermissionControllerTest extends TestCase
      *
      * @return void
      */
-    public function testListModuleActionPermission()
+    public function testListAbility()
     {
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
-        ])->getJson('/api/module-action-permission-list');
+        ])->getJson('/api/ability-list');
 
         $jsonData = json_decode($response->getContent(), true);
 
         $size = count($jsonData);
-        $this->assertEquals($size, 4);
+        $this->assertEquals($size, 3);
     }
 
     /**
-     * Testa o registro de um novo módulo action permissions.
+     * Testa o registro de ability superadmin.
      *
      * @return void
      */
-    public function testCreateModuleActionPermission()
+    public function testCreateAbilitySuperAdmin()
     {
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
-            ->postJson('/api/module-action-permission-create', [
-                'module_id' => '2',
-                'module_action_id' => '5',
-                'description' => 'Teste',
-                'link' => 'api/teste',
+            ->postJson('/api/ability-create', [
+                'module_id' => '1',
+                'module_action_id' => '1',
                 'active' => true,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('configuracao:select', $jsonData['name']);
+        $this->assertEquals('*', $jsonData['ability']);
         $this->assertEquals('1', $jsonData['active']);
     }
 
     /**
-     * Testa o update de um módulo action permissions.
+     * Testa o registro de ability.
      *
      * @return void
      */
-    public function testUpdateModuleActionPermission()
+    public function testCreateAbility()
     {
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
-            ->postJson('/api/module-action-permission-update', [
-                'id' => 2,
-                'description' => 'Teste alterado',
-                'link' => 'api/teste',
-                'active' => false,
+            ->postJson('/api/ability-create', [
+                'module_id' => '2',
+                'module_action_id' => '5',
+                'active' => true,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('configuracao:create', $jsonData['name']);
-        $this->assertEquals('Teste alterado', $jsonData['description']);
-        $this->assertEquals('0', $jsonData['active']);
-        $this->assertEquals('2', $jsonData['id']);
+        $this->assertEquals('configuracao:select', $jsonData['ability']);
+        $this->assertEquals('1', $jsonData['active']);
     }
 
     /**
@@ -101,7 +96,7 @@ class ModuleActionPermissionControllerTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
-            ->postJson('/api/module-action-permission-active', [
+            ->postJson('/api/ability-active', [
                 'id' => '1'
             ]);
 
@@ -114,7 +109,7 @@ class ModuleActionPermissionControllerTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
-            ->postJson('/api/module-action-permission-active', [
+            ->postJson('/api/ability-active', [
                 'id' => '1'
             ]);
 
@@ -135,7 +130,7 @@ class ModuleActionPermissionControllerTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
-            ->postJson('/api/module-action-permission-active', [
+            ->postJson('/api/ability-active', [
                 'id' => 5000000
             ]);
 
@@ -159,7 +154,7 @@ class ModuleActionPermissionControllerTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
-            ->postJson('/api/module-action-permission-active', []);
+            ->postJson('/api/ability-active', []);
 
         $jsonData = json_decode($response->getContent(), true);
 
@@ -174,58 +169,22 @@ class ModuleActionPermissionControllerTest extends TestCase
         $this->assertEquals($expected, $jsonData);
     }
 
+
     /**
-     * Testa o update de um módulo action permissions.
+     *  @dataProvider providerErrorAbilityRules
+     *
+     * Testa as validações nas regras do AbilityRules.
      *
      * @return void
      */
-    public function testUpdateModuleActionPermissionErrorLength()
-    {
-        $stringLong = Str::random(300);
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $this->token,
-            ])
-            ->postJson('/api/module-action-permission-update', [
-                'id' => 2,
-                'description' => $stringLong,
-                'link' => $stringLong,
-                'active' => false,
-            ]);
-
-        $jsonData = json_decode($response->getContent(), true);
-
-        $expected = [
-            'errors' => [
-                'description' => [
-                    "The description field must not be greater than 255 characters."
-                ],
-                'link' => [
-                    "The link field must not be greater than 255 characters."
-                ],
-            ]
-        ];
-
-        $this->assertEquals($expected, $jsonData);
-    }
-
-    /**
-     *  @dataProvider providerErrorCreateModuleActionPermissionRules
-     *
-     * Testa as validações nas regras do ModuleActionPermissionRules.
-     *
-     * @return void
-     */
-    public function testErrorCreateModuleActionPermissionRules($moduleId, $moduleActionId, $expected)
+    public function testErrorCreateAbilityRules($moduleId, $moduleActionId, $expected)
     {
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
-            ->postJson('/api/module-action-permission-create', [
+            ->postJson('/api/ability-create', [
                 'module_id' => $moduleId,
                 'module_action_id' => $moduleActionId,
-                'description' => 'Teste',
-                'link' => 'api/teste',
                 'active' => true,
             ]);
 
@@ -234,7 +193,7 @@ class ModuleActionPermissionControllerTest extends TestCase
         $this->assertEquals($expected, $jsonData);
     }
 
-    public static function providerErrorCreateModuleActionPermissionRules ()
+    public static function providerErrorAbilityRules ()
     {
         return [
             [
@@ -242,8 +201,8 @@ class ModuleActionPermissionControllerTest extends TestCase
                 2,
                 [
                     'errors' => [
-                        'name' => [
-                            "The name has already been taken."
+                        'ability' => [
+                            "The ability has already been taken."
                         ]
                     ]
                 ]
@@ -253,7 +212,7 @@ class ModuleActionPermissionControllerTest extends TestCase
                 1,
                 [
                     'errors' => [
-                        'name' => [
+                        'ability' => [
                             "The module do not exist."
                         ]
                     ]
@@ -264,7 +223,7 @@ class ModuleActionPermissionControllerTest extends TestCase
                 5000,
                 [
                     'errors' => [
-                        'name' => [
+                        'ability' => [
                             "The action do not exist."
                         ]
                     ]
@@ -275,7 +234,7 @@ class ModuleActionPermissionControllerTest extends TestCase
                 5000,
                 [
                     'errors' => [
-                        'name' => [
+                        'ability' => [
                             "The module and action do not exist."
                         ]
                     ]

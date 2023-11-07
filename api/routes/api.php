@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\AbilityController;
 use App\Http\Controllers\ModuleActionController;
-use App\Http\Controllers\ModuleActionPermissionController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserGroupController;
@@ -56,13 +56,12 @@ Route::post('/user-group-update', [UserGroupController::class, 'update'])
 Route::post('/user-group-active', [UserGroupController::class, 'active'])
     ->middleware(['auth:sanctum', 'abilities:usergroup:active']);
 
-#ModuleActionPermission
-Route::get('/module-action-permission-list', [ModuleActionPermissionController::class, 'list'])
-    ->middleware(['auth:sanctum', 'abilities:moduleactionpermission:list']);
-Route::post('/module-action-permission-create', [ModuleActionPermissionController::class, 'create'])
-    ->middleware(['auth:sanctum', 'abilities:moduleactionpermission:create']);
-Route::post('/module-action-permission-update', [ModuleActionPermissionController::class, 'update'])
-    ->middleware(['auth:sanctum', 'abilities:moduleactionpermission:update']);
-Route::post('/module-action-permission-active', [ModuleActionPermissionController::class, 'active'])
-    ->middleware(['auth:sanctum', 'abilities:moduleactionpermission:active']);
+#Ability
+Route::get('/ability-list', [AbilityController::class, 'list'])
+    ->middleware(['auth:sanctum', 'abilities:ability:list']);
+Route::post('/ability-create', [AbilityController::class, 'create'])
+    ->middleware(['auth:sanctum', 'abilities:ability:create']);
+Route::post('/ability-active', [AbilityController::class, 'active'])
+    ->middleware(['auth:sanctum', 'abilities:ability:active']);
+
 
