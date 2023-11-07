@@ -2,18 +2,28 @@
 
 namespace App\Services;
 
-use App\Repositories\Contracts\ModuleActionPermissionRepositoryInterface;
+use App\Repositories\Contracts\AbilityRepositoryInterface;
 use App\Repositories\Contracts\ModuleActionRepositoryInterface;
 use App\Repositories\Contracts\ModuleRepositoryInterface;
 
-class ModuleActionPermissionService
+class AbilityService
 {
-    protected $moduleActionPermissionRepository;
+    protected $abilityRepository;
     protected $moduleRepository;
     protected $moduleActionRepository;
 
     /**
-     * Formato que deve ser montado o nome do ModuleActionPermission
+     * Constantes que montam o "Superadmin"
+     * ALL_MODULE Acesso a todos os módulos
+     * ALL_ACTION Acesso a todoas as actions
+     * ALL_ABILITY habilidade que tem acesso a tudo "Superadmin"
+     **/
+    const ALL_MODULE = "1";
+    const ALL_ACTION = "1";
+    const ALL_ABILITY = "*";
+
+    /**
+     * Formato que deve ser montado o nome da Ability
      * NAME_FORMAT é o formato que deve ser montado, module:action
      * NAME_SEPARATOR é o separador em si, no caso ":"
      **/
@@ -21,43 +31,33 @@ class ModuleActionPermissionService
     const NAME_SEPARATOR = ":";
 
     public function __construct(
-        ModuleActionPermissionRepositoryInterface $moduleActionPermissionRepository,
+        AbilityRepositoryInterface $abilityRepository,
         ModuleRepositoryInterface $moduleRepository,
         ModuleActionRepositoryInterface $moduleActionRepository
     ) {
-        $this->moduleActionPermissionRepository = $moduleActionPermissionRepository;
+        $this->abilityRepository = $abilityRepository;
         $this->moduleRepository = $moduleRepository;
         $this->moduleActionRepository = $moduleActionRepository;
     }
 
     /**
-     * get all modules
+     * get all ability
      *
      * @return array
     */
     public function getAll()
     {
-        return $this->moduleActionPermissionRepository->getAll();
+        return $this->abilityRepository->getAll();
     }
 
     /**
-     * Create module
+     * Create ability
      *
      * @return array
     */
     public function make(array $data)
     {
-        return $this->moduleActionPermissionRepository->make($data);
-    }
-
-    /**
-     * Update module
-     *
-     * @return array
-    */
-    public function update(array $data)
-    {
-        return $this->moduleActionPermissionRepository->update($data);
+        return $this->abilityRepository->make($data);
     }
 
     /**
@@ -67,21 +67,21 @@ class ModuleActionPermissionService
     */
     public function active(int $id)
     {
-        return $this->moduleActionPermissionRepository->active($id);
+        return $this->abilityRepository->active($id);
     }
 
     /**
-     * Verifica se ja existe o módulo
+     * Verifica se ja existe o ability
      *
      * @return array
     */
-    public function exists(?int $id, string $name)
+    public function exists(?int $id, string $ability)
     {
-        return $this->moduleActionPermissionRepository->exists($id, $name);
+        return $this->abilityRepository->exists($id, $ability);
     }
 
     /**
-     * Create module
+     * Generate name ability
      *
      * @return array
     */
@@ -89,6 +89,10 @@ class ModuleActionPermissionService
     {
         $moduleName = "";
         $moduleActionName = "";
+
+        if ($data['module_id'] == self::ALL_MODULE && $data['module_action_id'] == self::ALL_ACTION) {
+            return self::ALL_ABILITY;
+        }
 
         $filters = [
            ['id', '=', $data['module_id']],
