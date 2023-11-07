@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class ModuleActionPermission extends Model
+class Ability extends Model
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $table = 'modules_actions_permissions';
+    protected $table = 'abilities';
 
     public $timestamps = false;
 
@@ -23,9 +23,7 @@ class ModuleActionPermission extends Model
     protected $fillable = [
         'module_id',
         'module_action_id',
-        'name',
-        'description',
-        'link',
+        'ability',
         'active',
     ];
 }
