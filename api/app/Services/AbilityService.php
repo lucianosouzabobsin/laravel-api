@@ -51,6 +51,17 @@ class AbilityService
     }
 
     /**
+     * Find By id
+     *
+     * @return array
+    */
+    public function find(int $id)
+    {
+        return $this->abilityRepository->find($id);
+    }
+
+
+    /**
      * Create ability
      *
      * @return array

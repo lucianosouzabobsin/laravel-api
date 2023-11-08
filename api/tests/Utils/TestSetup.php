@@ -40,6 +40,8 @@ class TestSetup
         $this->db->statement($importSql);
         $importSql = file_get_contents($resourcesDirectory. '/database/tables/dump_abilities.sql');
         $this->db->statement($importSql);
+        $importSql = file_get_contents($resourcesDirectory. '/database/tables/dump_user_group_has_abilities.sql');
+        $this->db->statement($importSql);
 
 
         $importSql = file_get_contents($resourcesDirectory. '/database/data/inject_users.sql');
@@ -51,6 +53,8 @@ class TestSetup
         $importSql = file_get_contents($resourcesDirectory. '/database/data/inject_modules_actions.sql');
         $this->db->statement($importSql);
         $importSql = file_get_contents($resourcesDirectory. '/database/data/inject_abilities.sql');
+        $this->db->statement($importSql);
+        $importSql = file_get_contents($resourcesDirectory. '/database/data/inject_user_group_has_abilities.sql');
         $this->db->statement($importSql);
     }
 }

@@ -4,6 +4,7 @@ INSERT INTO `abilities`
 `ability`,
 `active`)
 VALUES
+(1,1, '*', 1),
 (2,2, 'configuracao:create', 1),
 (2,3, 'configuracao:update', 1),
 (3,3, 'cadastro:update', 1);

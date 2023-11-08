@@ -7,6 +7,7 @@ use App\Repositories\Contracts\{
     ModuleActionRepositoryInterface,
     UserRepositoryInterface,
     ModuleRepositoryInterface,
+    UserGroupHasAbilitiesRepositoryInterface,
     UserGroupRepositoryInterface
 };
 use App\Repositories\{
@@ -14,6 +15,7 @@ use App\Repositories\{
     ModuleActionRepository,
     UserRepository,
     ModuleRepository,
+    UserGroupHasAbilitiesRepository,
     UserGroupRepository
 };
 
@@ -49,6 +51,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             AbilityRepositoryInterface::class,
             AbilityRepository::class
+        );
+
+        $this->app->bind(
+            UserGroupHasAbilitiesRepositoryInterface::class,
+            UserGroupHasAbilitiesRepository::class
         );
     }
 

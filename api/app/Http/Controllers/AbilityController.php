@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Rules\AbilityRules;
+use App\Rules\AbilitySuperAdminRules;
 use App\Services\AbilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -68,27 +69,21 @@ class AbilityController extends Controller
      */
     public function active(Request $request)
     {
-        try {
-            $inputs = $request->all();
+        $inputs = $request->all();
 
-            $validator = Validator::make($inputs, [
-                'id' => ['required']
-            ]);
+        $validator = Validator::make($inputs, [
+            'id' => [
+                'required',
+                new AbilitySuperAdminRules($inputs, $this->abilityService)
+            ]
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
-
-            $ability = $this->abilityService->active($inputs['id']);
-
-            return response()->json($ability, 201);
-        } catch (\Throwable $th) {
-            $error = 'Bad request';
-
-            return response()->json([
-                'error' => $error,
-                'description_error' => $th->getMessage()
-            ], 404);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
+
+        $ability = $this->abilityService->active($inputs['id']);
+
+        return response()->json($ability, 201);
     }
 }
