@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Rules\UserGroupExists;
+use App\Rules\UserGroupSuperAdminRules;
 use App\Services\UserGroupService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -70,12 +71,6 @@ class UserGroupController extends Controller
 
         $validator = Validator::make($inputs, [
             'id' => ['required'],
-            'name' => [
-                'required',
-                'string',
-                'max:30',
-                new UserGroupExists($inputs, $this->userGroupService)
-            ],
             'description' => 'required|string|max:255',
             'active' => 'required|boolean',
         ]);
@@ -97,27 +92,21 @@ class UserGroupController extends Controller
      */
     public function active(Request $request)
     {
-        try {
-            $inputs = $request->all();
+        $inputs = $request->all();
 
-            $validator = Validator::make($inputs, [
-                'id' => ['required']
-            ]);
+        $validator = Validator::make($inputs, [
+            'id' => [
+                'required',
+                new UserGroupSuperAdminRules($inputs, $this->userGroupService)
+            ]
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
-
-            $module = $this->userGroupService->active($inputs['id']);
-
-            return response()->json($module, 201);
-        } catch (\Throwable $th) {
-            $error = 'Bad request';
-
-            return response()->json([
-                'error' => $error,
-                'description_error' => $th->getMessage()
-            ], 404);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
+
+        $module = $this->userGroupService->active($inputs['id']);
+
+        return response()->json($module, 201);
     }
 }

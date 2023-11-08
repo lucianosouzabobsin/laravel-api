@@ -8,6 +8,11 @@ class UserGroupService
 {
     protected $userGroupRepository;
 
+    /**
+     * SUPER_ADMIN usuário superadmin
+     **/
+    const SUPER_ADMIN = "superadmin";
+
     public function __construct(UserGroupRepositoryInterface $userGroupRepository)
     {
         $this->userGroupRepository = $userGroupRepository;
@@ -22,6 +27,17 @@ class UserGroupService
     {
         return $this->userGroupRepository->getAll();
     }
+
+    /**
+     * Find By id
+     *
+     * @return array
+    */
+    public function find(int $id)
+    {
+        return $this->userGroupRepository->find($id);
+    }
+
 
     /**
      * Create module

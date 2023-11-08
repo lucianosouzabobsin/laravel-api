@@ -4,6 +4,7 @@ namespace Tests\Feature\Controller;
 
 use Tests\TestCase;
 use Tests\Utils\TestSetup;
+use Illuminate\Support\Str;
 
 class UserGroupControllerTest extends TestCase
 {
@@ -106,14 +107,12 @@ class UserGroupControllerTest extends TestCase
             ])
             ->postJson('/api/user-group-update', [
                 'id' => 1,
-                'name' => 'superadmin',
                 'description' => 'Descrição do superadmin',
                 'active' => false,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('superadmin', $jsonData['name']);
         $this->assertEquals('Descrição do superadmin', $jsonData['description']);
         $this->assertEquals('0', $jsonData['active']);
         $this->assertEquals('1', $jsonData['id']);
@@ -121,19 +120,20 @@ class UserGroupControllerTest extends TestCase
 
 
     /**
-     * Testa o update de um grupo de usuario ja existente em outra chave.
+     * Testa o update de um grupo de usuario com description estourada.
      *
      * @return void
      */
-    public function testErrorUpdateUserGroupAnotherAlreadyExists()
+    public function testUpdateUserGroupErrorLength()
     {
+        $stringLong = Str::random(300);
+
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/user-group-update', [
                 'id' => 3,
-                'name' => 'superadmin',
-                'description' => 'Admin',
+                'description' => $stringLong,
                 'active' => false,
             ]);
 
@@ -141,8 +141,8 @@ class UserGroupControllerTest extends TestCase
 
         $expected = [
             'errors' => [
-                'name' => [
-                    "The name has already been taken."
+                'description' => [
+                    "The description field must not be greater than 255 characters."
                 ]
             ]
         ];
@@ -161,28 +161,56 @@ class UserGroupControllerTest extends TestCase
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/user-group-active', [
-                'id' => '1'
+                'id' => '2'
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
         //Inativar
         $this->assertEquals('0', $jsonData['active']);
-        $this->assertEquals('1', $jsonData['id']);
+        $this->assertEquals('2', $jsonData['id']);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/user-group-active', [
-                'id' => '1'
+                'id' => '2'
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
         //Ativar
         $this->assertEquals('1', $jsonData['active']);
-        $this->assertEquals('1', $jsonData['id']);
+        $this->assertEquals('2', $jsonData['id']);
     }
+
+    /**
+     * @Testa ativar e inativar superAdmin.
+     *
+     * @return void
+     */
+    public function testActiveInactiveSuperAdminError()
+    {
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->token,
+            ])
+            ->postJson('/api/user-group-active', [
+                'id' => 1
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'errors' => [
+                'id' => [
+                    "Super admin userGroup cannot be revoked."
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $jsonData);
+    }
+
 
     /**
      * @Testa ativar e inativar com id invalido.
@@ -201,8 +229,11 @@ class UserGroupControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $expected = [
-            'error' => 'Bad request',
-            'description_error' => 'Attempt to read property "active" on null',
+            'errors' => [
+                'id' => [
+                    "The userGroup does not exist."
+                ]
+            ]
         ];
 
         $this->assertEquals($expected, $jsonData);
