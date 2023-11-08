@@ -39,7 +39,7 @@ class AbilityControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $size = count($jsonData);
-        $this->assertEquals($size, 3);
+        $this->assertEquals($size, 4);
     }
 
     /**
@@ -47,7 +47,7 @@ class AbilityControllerTest extends TestCase
      *
      * @return void
      */
-    public function testCreateAbilitySuperAdmin()
+    public function testCreateAbilitySuperAdminError()
     {
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
@@ -60,8 +60,15 @@ class AbilityControllerTest extends TestCase
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('*', $jsonData['ability']);
-        $this->assertEquals('1', $jsonData['active']);
+        $expected = [
+            'errors' => [
+                'ability' => [
+                    "The ability has already been taken."
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $jsonData);
     }
 
     /**
@@ -97,27 +104,54 @@ class AbilityControllerTest extends TestCase
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/ability-active', [
-                'id' => '1'
+                'id' => '2'
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
         //Inativar
         $this->assertEquals('0', $jsonData['active']);
-        $this->assertEquals('1', $jsonData['id']);
+        $this->assertEquals('2', $jsonData['id']);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
             ])
             ->postJson('/api/ability-active', [
-                'id' => '1'
+                'id' => '2'
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
         //Ativar
         $this->assertEquals('1', $jsonData['active']);
-        $this->assertEquals('1', $jsonData['id']);
+        $this->assertEquals('2', $jsonData['id']);
+    }
+
+    /**
+     * @Testa ativar e inativar habilidades de superAdmin.
+     *
+     * @return void
+     */
+    public function testActiveInactiveSuperAdminError()
+    {
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->token,
+            ])
+            ->postJson('/api/ability-active', [
+                'id' => 1
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'errors' => [
+                'id' => [
+                    "Super admin ability cannot be revoked."
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $jsonData);
     }
 
     /**
@@ -137,8 +171,11 @@ class AbilityControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $expected = [
-            'error' => 'Bad request',
-            'description_error' => 'Attempt to read property "active" on null',
+            'errors' => [
+                'id' => [
+                    "The ability does not exist."
+                ]
+            ]
         ];
 
         $this->assertEquals($expected, $jsonData);

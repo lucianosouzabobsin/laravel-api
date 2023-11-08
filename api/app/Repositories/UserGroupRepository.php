@@ -27,6 +27,9 @@ class UserGroupRepository implements UserGroupRepositoryInterface
 
     /**
      * Update entity
+     *
+     * Não deve ser feito update no name
+     *
      * @param array $data
      *
      * @return array
@@ -35,7 +38,6 @@ class UserGroupRepository implements UserGroupRepositoryInterface
     {
         $entity = $this->entity->find($data['id']);
 
-        $entity->name = $data['name'];
         $entity->description = $data['description'];
         $entity->active = $data['active'];
         $entity->save();
@@ -51,6 +53,17 @@ class UserGroupRepository implements UserGroupRepositoryInterface
     public function getAll()
     {
         return $this->entity->all();
+    }
+
+    /**
+     * Return ability
+     * @param int $id
+     *
+     * @return array
+     */
+    public function find(int $id)
+    {
+        return $this->entity->where('id', $id)->first();
     }
 
     /**

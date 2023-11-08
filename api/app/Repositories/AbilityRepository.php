@@ -41,6 +41,17 @@ class AbilityRepository implements AbilityRepositoryInterface
      *
      * @return array
      */
+    public function find(int $id)
+    {
+        return $this->entity->where('id', $id)->first();
+    }
+
+    /**
+     * Return ability
+     * @param int $id
+     *
+     * @return array
+     */
     public function active(int $id)
     {
         $entity = $this->entity->find($id);
