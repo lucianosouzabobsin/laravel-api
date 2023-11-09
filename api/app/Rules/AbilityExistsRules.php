@@ -2,13 +2,13 @@
 
 namespace App\Rules;
 
-use App\Services\UserGroupHasAbilitiesService;
+use App\Services\AbilityService;
 use Illuminate\Contracts\Validation\Rule;
 
-class UserGroupHasAbilitiesRules implements Rule
+class AbilityExistsRules implements Rule
 {
     private $request;
-    protected $userGroupHasAbilitiesService;
+    protected $abilityService;
     protected $messageError;
 
     /**
@@ -16,10 +16,10 @@ class UserGroupHasAbilitiesRules implements Rule
      *
      * @return void
      */
-    public function __construct($request, UserGroupHasAbilitiesService $userGroupHasAbilitiesService)
+    public function __construct($request, AbilityService $abilityService)
     {
         $this->request = $request;
-        $this->userGroupHasAbilitiesService = $userGroupHasAbilitiesService;
+        $this->abilityService = $abilityService;
     }
 
 
@@ -32,12 +32,18 @@ class UserGroupHasAbilitiesRules implements Rule
      */
     public function passes($attribute, $value)
     {
-        $userGroupId = $this->request['user_group_id'];
         $abilitiesIds = $this->request['abilities_ids'];
 
         foreach ($abilitiesIds as $abilityId) {
-            if ($this->userGroupHasAbilitiesService->exists($userGroupId, $abilityId)) {
-                $this->messageError = sprintf('The ability %s already exists for the user group.', $abilityId);
+            $ability = $this->abilityService->find($abilityId);
+
+            if (!$ability) {
+                $this->messageError = sprintf('The ability %s does not exist.', $abilityId);
+                return false;
+            }
+
+            if ($ability->ability == $this->abilityService::ALL_ABILITY) {
+                $this->messageError = sprintf('Superadmin ability cannot be added.');
                 return false;
             }
         }

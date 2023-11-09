@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Rules\UserGroupHasAbilitiesRules;
+use App\Rules\AbilityExistsRules;
+use App\Services\AbilityService;
 use App\Services\UserGroupHasAbilitiesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -10,21 +11,24 @@ use Illuminate\Support\Facades\Validator;
 class UserGroupHasAbilitiesController extends Controller
 {
     protected $userGroupHasAbilitiesService;
+    protected $abilityService;
 
-    public function __construct(UserGroupHasAbilitiesService $userGroupHasAbilitiesService)
+    public function __construct(UserGroupHasAbilitiesService $userGroupHasAbilitiesService, AbilityService $abilityService)
     {
         $this->userGroupHasAbilitiesService = $userGroupHasAbilitiesService;
+        $this->abilityService = $abilityService;
     }
 
 
     /**
      * Return list Users Groups
      *
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function list()
+    public function list(Request $request)
     {
-        $userGroupHasAbilities = $this->userGroupHasAbilitiesService->getAll();
+        $userGroupHasAbilities = $this->userGroupHasAbilitiesService->getAll($request->all());
 
         return response()->json($userGroupHasAbilities, 201);
     }
@@ -44,7 +48,7 @@ class UserGroupHasAbilitiesController extends Controller
             'abilities_ids' => [
                 'required',
                 'array',
-                new UserGroupHasAbilitiesRules($inputs, $this->userGroupHasAbilitiesService)
+                new AbilityExistsRules($inputs, $this->abilityService)
             ],
         ]);
 

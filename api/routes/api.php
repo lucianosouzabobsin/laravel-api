@@ -66,7 +66,7 @@ Route::post('/ability-active', [AbilityController::class, 'active'])
     ->middleware(['auth:sanctum', 'abilities:ability:active']);
 
 #UserGroupAbility
-Route::get('/user-group-ability-list', [UserGroupHasAbilitiesController::class, 'list'])
+Route::post('/user-group-ability-list', [UserGroupHasAbilitiesController::class, 'list'])
     ->middleware(['auth:sanctum', 'abilities:usergroupability:list']);
 Route::post('/user-group-ability-create', [UserGroupHasAbilitiesController::class, 'create'])
     ->middleware(['auth:sanctum', 'abilities:usergroupability:create']);
