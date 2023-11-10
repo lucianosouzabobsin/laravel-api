@@ -42,12 +42,12 @@ class UserGroupHasAbilitiesController extends Controller
     public function create(Request $request)
     {
         $inputs = $request->all();
+        $inputs['abilities_ids'] = explode(",", $inputs['abilities_ids']);
 
         $validator = Validator::make($inputs, [
             'user_group_id' => ['required', 'numeric'],
             'abilities_ids' => [
                 'required',
-                'array',
                 new AbilityExistsRules($inputs, $this->abilityService)
             ],
         ]);

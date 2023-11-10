@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Rules\UserGroupExists;
 use App\Rules\UserGroupSuperAdminRules;
+use App\Services\UserGroupHasAbilitiesService;
 use App\Services\UserGroupService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -11,10 +12,12 @@ use Illuminate\Support\Facades\Validator;
 class UserGroupController extends Controller
 {
     protected $userGroupService;
+    protected $userGroupHasAbilitiesService;
 
-    public function __construct(UserGroupService $userGroupService)
+    public function __construct(UserGroupService $userGroupService, UserGroupHasAbilitiesService $userGroupHasAbilitiesService)
     {
         $this->userGroupService = $userGroupService;
+        $this->userGroupHasAbilitiesService = $userGroupHasAbilitiesService;
     }
 
 
@@ -45,7 +48,11 @@ class UserGroupController extends Controller
                 'required',
                 'string',
                 'max:30',
-                new UserGroupExists($inputs, $this->userGroupService)
+                new UserGroupExists(
+                    $request->all(),
+                    $this->userGroupService,
+                    $this->userGroupHasAbilitiesService
+                )
             ],
             'description' => ['required', 'string', 'max:255'],
         ]);

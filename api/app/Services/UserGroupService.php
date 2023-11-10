@@ -38,7 +38,6 @@ class UserGroupService
         return $this->userGroupRepository->find($id);
     }
 
-
     /**
      * Create module
      *

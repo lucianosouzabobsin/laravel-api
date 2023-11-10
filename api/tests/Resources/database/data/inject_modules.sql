@@ -4,7 +4,7 @@ INSERT INTO `modules`
 `description`,
 `active`)
 VALUES
-('all', 'All', 'Module teste 1',1),
+('all', 'All', 'All',1),
 ('configuracao', 'Configuração','Module teste 2',1),
 ('cadastro', 'Cadastro','Module teste 3',1),
 ('usuarios', 'Usuários','Module teste 4',1),

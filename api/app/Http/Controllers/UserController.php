@@ -3,17 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Rules\UserExists;
+use App\Rules\UserGroupExists;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\AuthUser;
+use App\Services\UserGroupHasAbilitiesService;
+use App\Services\UserGroupService;
 
 class UserController extends Controller
 {
     protected $authUserService;
+    protected $userGroupService;
+    protected $userGroupHasAbilitiesService;
 
-    public function __construct(AuthUser $authUserService)
+    public function __construct(
+        AuthUser $authUserService,
+        UserGroupService $userGroupService,
+        UserGroupHasAbilitiesService $userGroupHasAbilitiesService
+    )
     {
         $this->authUserService = $authUserService;
+        $this->userGroupService = $userGroupService;
+        $this->userGroupHasAbilitiesService = $userGroupHasAbilitiesService;
     }
 
     /**
@@ -26,6 +37,14 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
+            'user_group_id' => [
+                'required',
+                new UserGroupExists(
+                    $request->all(),
+                    $this->userGroupService,
+                    $this->userGroupHasAbilitiesService
+                )
+            ],
             'email' => [
                 'required',
                 'string',
