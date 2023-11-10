@@ -25,6 +25,34 @@ class UserControllerTest extends TestCase
     }
 
     /**
+     * Testa o registro de um novo usuário com grupo se habilidades.
+     *
+     * @return void
+     */
+    public function testRegisterUserWithUserGroupWithoutAbilities()
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'Usuario 4',
+            'user_group_id' => 3,
+            'email' => 'usuario4@test.com',
+            'password' => 'password123',
+        ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'errors' => [
+                'user_group_id' => [
+                    "The userGroup does not have abilities."
+                ]
+            ]
+        ];
+
+        $response->assertStatus(422);
+        $this->assertEquals($expected, $jsonData);
+    }
+
+    /**
      * Testa o registro de um novo usuário.
      *
      * @return void
@@ -33,6 +61,7 @@ class UserControllerTest extends TestCase
     {
         $response = $this->postJson('/api/register', [
             'name' => 'Usuario 4',
+            'user_group_id' => 2,
             'email' => 'usuario4@test.com',
             'password' => 'password123',
         ]);
@@ -48,6 +77,7 @@ class UserControllerTest extends TestCase
     public function testRegisterUserErrorValidatorNoName()
     {
         $response = $this->postJson('/api/register', [
+            'user_group_id' => 2,
             'email' => 'usuario5@test.com',
             'password' => 'password123',
         ]);
@@ -67,6 +97,61 @@ class UserControllerTest extends TestCase
     }
 
     /**
+     * Testa endpoint sem user group id.
+     *
+     * @return void
+     */
+    public function testRegisterUserErrorValidatorNoUserGroupId()
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'Usuario 4',
+            'email' => 'usuario5@test.com',
+            'password' => 'password123',
+        ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'errors' => [
+                'user_group_id' => [
+                    "The user group id field is required."
+                ]
+            ]
+        ];
+
+        $response->assertStatus(422);
+        $this->assertEquals($expected, $jsonData);
+    }
+
+    /**
+     * Testa endpoint com user group id invalido.
+     *
+     * @return void
+     */
+    public function testRegisterUserErrorValidatorNoUserGroupIdInvalid()
+    {
+        $response = $this->postJson('/api/register', [
+            'user_group_id' => 2000000,
+            'name' => 'Usuario 4',
+            'email' => 'usuario5@test.com',
+            'password' => 'password123',
+        ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'errors' => [
+                'user_group_id' => [
+                    "The userGroup does not exist."
+                ]
+            ]
+        ];
+
+        $response->assertStatus(422);
+        $this->assertEquals($expected, $jsonData);
+    }
+
+    /**
      * Testa endpoint sem senha.
      *
      * @return void
@@ -75,6 +160,7 @@ class UserControllerTest extends TestCase
     {
         $response = $this->postJson('/api/register', [
             'name' => 'Usuario 5',
+            'user_group_id' => 2,
             'email' => 'usuario5@test.com',
             'password' => '',
         ]);
@@ -102,6 +188,7 @@ class UserControllerTest extends TestCase
     {
         $response = $this->postJson('/api/register', [
             'name' => 'Usuario 5',
+            'user_group_id' => 2,
             'email' => 'usuario5@test.com',
             'password' => '1234567',
         ]);
@@ -129,6 +216,7 @@ class UserControllerTest extends TestCase
     {
         $response = $this->postJson('/api/register', [
             'name' => 'usuario 3 repet',
+            'user_group_id' => 2,
             'email' => 'usuario3@test.com',
             'password' => 'password1234666',
         ]);
@@ -164,6 +252,9 @@ class UserControllerTest extends TestCase
 
         $expected = [
             'errors' => [
+                'user_group_id' => [
+                    "The user group id field is required."
+                ],
                 'name' => [
                     "The name field is required."
                 ],
@@ -189,7 +280,7 @@ class UserControllerTest extends TestCase
     public function testLoginUser()
     {
         $response = $this->postJson('/api/login', [
-            'email' => 'usuario3@test.com',
+            'email' => 'usuario2@test.com',
             'password' => 'password',
         ]);
 
@@ -204,7 +295,7 @@ class UserControllerTest extends TestCase
     public function testLoginUserUnauthorised()
     {
         $response = $this->postJson('/api/login', [
-            'email' => 'usuario3@test.com',
+            'email' => 'usuario2@test.com',
             'password' => 'passwordwrong',
         ]);
 
@@ -230,7 +321,8 @@ class UserControllerTest extends TestCase
                 'name' => 'Usuario 1',
                 'email' => 'usuario1@test.com',
                 'created_at' => null,
-                'updated_at' => null
+                'updated_at' => null,
+                'user_group_id' => 1
             ]
         ];
 
