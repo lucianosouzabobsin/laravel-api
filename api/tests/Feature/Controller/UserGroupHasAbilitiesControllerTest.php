@@ -143,7 +143,7 @@ class UserGroupHasAbilitiesControllerTest extends TestCase
             ])
             ->postJson('/api/user-group-ability-create', [
                 'user_group_id' => '3',
-                'abilities_ids' => ['2','3']
+                'abilities_ids' => "2,3"
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -170,7 +170,7 @@ class UserGroupHasAbilitiesControllerTest extends TestCase
             ])
             ->postJson('/api/user-group-ability-create', [
                 'user_group_id' => '2',
-                'abilities_ids' => ['1','20000000000']
+                'abilities_ids' => "1,20000000000"
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -198,7 +198,7 @@ class UserGroupHasAbilitiesControllerTest extends TestCase
             ])
             ->postJson('/api/user-group-ability-create', [
                 'user_group_id' => '2',
-                'abilities_ids' => ['2','20000000000']
+                'abilities_ids' => "2,20000000000"
             ]);
 
         $jsonData = json_decode($response->getContent(), true);

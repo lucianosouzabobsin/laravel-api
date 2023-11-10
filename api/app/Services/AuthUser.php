@@ -5,16 +5,24 @@ namespace App\Services;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Repositories\Contracts\UserGroupRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Carbon\Carbon;
 
 class AuthUser
 {
     protected $userRepository;
+    protected $userGroupRepository;
+    protected $userGroupHasAbilitiesService;
 
-    public function __construct(UserRepositoryInterface $userRepository)
-    {
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        UserGroupRepositoryInterface $userGroupRepository,
+        UserGroupHasAbilitiesService $userGroupHasAbilitiesService
+    ) {
         $this->userRepository = $userRepository;
+        $this->userGroupRepository = $userGroupRepository;
+        $this->userGroupHasAbilitiesService = $userGroupHasAbilitiesService;
     }
 
     /**
@@ -27,6 +35,7 @@ class AuthUser
     {
         $user = $this->userRepository->make([
             'name' => $request->name,
+            'user_group_id' => $request->user_group_id,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
@@ -68,10 +77,28 @@ class AuthUser
      * @return String
      */
     private function createToken(User $user) {
+        $userGroupAbilities = $this->getAbilities($user);
+
         return $user->createToken(
             $user->name.'_'.Carbon::now(),
-            ['*'],
+            $userGroupAbilities,
             Carbon::now()->addHour()
         )->plainTextToken;
+    }
+
+    /**
+     * Create Token
+     *
+     * @param User $user
+     * @return Array
+     */
+    private function getAbilities(User $user) {
+
+        $filters['user_group_id'] = $user->user_group_id;
+
+        $userGroup = $this->userGroupRepository->find($user->user_group_id);
+        $userGroupAbilities = $this->userGroupHasAbilitiesService->getAll($filters);
+
+        return $userGroupAbilities[$userGroup->name]['text'];
     }
 }

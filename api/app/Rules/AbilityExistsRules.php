@@ -42,7 +42,7 @@ class AbilityExistsRules implements Rule
                 return false;
             }
 
-            if ($ability->ability == $this->abilityService::ALL_ABILITY) {
+            if ($ability['ability'] == $this->abilityService::ALL_ABILITY) {
                 $this->messageError = sprintf('Superadmin ability cannot be added.');
                 return false;
             }
