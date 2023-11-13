@@ -5,16 +5,26 @@ namespace App\Http\Controllers;
 use App\Rules\AbilityRules;
 use App\Rules\AbilitySuperAdminRules;
 use App\Services\AbilityService;
+use App\Services\ModuleActionService;
+use App\Services\ModuleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class AbilityController extends Controller
 {
     protected $abilityService;
+    protected $moduleService;
+    protected $moduleActionService;
 
-    public function __construct(AbilityService $abilityService)
+    public function __construct(
+        AbilityService $abilityService,
+        ModuleService $moduleService,
+        ModuleActionService $moduleActionService
+    )
     {
         $this->abilityService = $abilityService;
+        $this->moduleService = $moduleService;
+        $this->moduleActionService = $moduleActionService;
     }
 
 
@@ -85,5 +95,80 @@ class AbilityController extends Controller
         $ability = $this->abilityService->active($inputs['id']);
 
         return response()->json($ability, 201);
+    }
+
+    /**
+     * Handles Registration Request
+     */
+    public function run()
+    {
+        $path = base_path('routes/api.php');
+        $contents = file_get_contents($path);
+
+        // Use uma expressão regular para encontrar as palavras entre ->middleware(['auth:sanctum', 'abilities: e ']);
+        preg_match_all("/\->middleware\(\['auth:sanctum', 'abilities:(.*?)'\]\);/", $contents, $matches);
+
+        $newModules = 0;
+        $newActions = 0;
+        $newAbilities = 0;
+
+        // $matches[1] conterá as palavras capturadas
+        foreach ($matches[1] as $match) {
+
+            if ($match == $this->abilityService::ALL_ABILITY) {
+                continue;
+            }
+
+            list($moduleMatch, $actionMatch) = explode(":", $match);
+
+            $module = $this->moduleService->findBy([
+                ['name', '=', $moduleMatch],
+            ]);
+
+
+            if (is_null($module)) {
+                $module = $this->moduleService->make([
+                    'name' => $moduleMatch,
+                    'nickname' => ucfirst($moduleMatch),
+                    'description' => ucfirst($moduleMatch)
+                ]);
+
+                $newModules ++;
+            }
+
+            $action = $this->moduleActionService->findBy([
+                ['action', '=', $actionMatch],
+            ]);
+
+            if (is_null($action)) {
+                $action = $this->moduleActionService->make([
+                    'action' => $actionMatch
+                ]);
+
+                $newActions ++;
+            }
+
+            $ability = $this->abilityService->findBy([
+                ['ability', '=', $match],
+            ]);
+
+            if (is_null($ability)) {
+                $ability = $this->abilityService->make([
+                    'module_id' =>$module['id'],
+                    'module_action_id' =>$action['id'],
+                    'ability' => $match
+                ]);
+
+                $newAbilities ++;
+            }
+        }
+
+        return response()->json([
+            'result' => [
+                'new modules' => $newModules,
+                'new actions' => $newActions,
+                'new abilities' => $newAbilities
+            ]
+        ], 201);
     }
 }

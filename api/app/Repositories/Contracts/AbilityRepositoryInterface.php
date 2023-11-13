@@ -9,5 +9,6 @@ interface AbilityRepositoryInterface
     public function find(int $id);
     public function active(int $id);
     public function exists(?int $id, string $ability);
+    public function findBy(array $filters);
 
 }
