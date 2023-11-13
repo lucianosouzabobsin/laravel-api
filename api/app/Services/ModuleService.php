@@ -62,4 +62,14 @@ class ModuleService
     {
         return $this->moduleRepository->exists($id, $name);
     }
+
+    /**
+     * Find
+     *
+     * @return array
+    */
+    public function findBy(array $filters)
+    {
+        return $this->moduleRepository->findBy($filters);
+    }
 }

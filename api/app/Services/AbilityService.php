@@ -127,4 +127,14 @@ class AbilityService
 
         return sprintf(self::NAME_FORMAT, $moduleName, $moduleActionName);
     }
+
+    /**
+     * Find
+     *
+     * @return array
+    */
+    public function findBy(array $filters)
+    {
+        return $this->abilityRepository->findBy($filters);
+    }
 }

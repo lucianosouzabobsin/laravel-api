@@ -4,7 +4,6 @@ namespace Tests\Feature\Controller;
 
 use Tests\TestCase;
 use Tests\Utils\TestSetup;
-use Illuminate\Support\Str;
 
 class AbilityControllerTest extends TestCase
 {
@@ -200,6 +199,31 @@ class AbilityControllerTest extends TestCase
                 'id' => [
                     "The id field is required."
                 ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $jsonData);
+    }
+
+    /**
+     * Testa o run.
+     *
+     * @return void
+     */
+    public function testRun()
+    {
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->token,
+            ])
+            ->getJson('/api/ability-run', []);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            'result' => [
+                'new modules' => 6,
+                'new actions' => 3,
+                'new abilities' => 18
             ]
         ];
 
