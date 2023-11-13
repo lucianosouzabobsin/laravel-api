@@ -5,7 +5,6 @@ namespace Tests\Feature\Controller;
 use App\Models\Ability;
 use App\Models\Module;
 use App\Models\ModuleAction;
-use App\Models\User;
 use App\Models\UserGroup;
 use App\Models\UserGroupHasAbilities;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,100 +15,39 @@ class UserToPerformActionControllerTest extends TestCase
     use RefreshDatabase;
 
     /**
+     *  @dataProvider providerData
+     *
      * Testa o registro de um novo usuário.
      *
      * @return void
      */
-    public function testRegisterUserNotAuthorizedToPerformThisAction()
+    public function testRegisterUserNotAuthorizedToPerformThisAction(
+        $userGroups,
+        $modules,
+        $modulesActions,
+        $abilities,
+        $userGroupHasAbilities
+    )
     {
-        UserGroup::create([
-            'name' => 'superadmin',
-            'description' => 'Super Administrador',
-            'active' => 1
-        ]);
+        foreach ($userGroups as $userGroup) {
+            UserGroup::create($userGroup);
+        }
 
-        UserGroup::create([
-            'name' => 'admin',
-            'description' => 'Administrador',
-            'active' => 1
-        ]);
+        foreach ($modules as $module) {
+            Module::create($module);
+        }
 
-        Module::create([
-            'name' => 'all',
-            'nickname' => 'All',
-            'description' => 'All',
-            'active' => 1
-        ]);
-        Module::create([
-            'name' => 'module',
-            'nickname' => 'module',
-            'description' => 'module',
-            'active' => 1
-        ]);
-        Module::create([
-            'name' => 'moduleaction',
-            'nickname' => 'moduleaction',
-            'description' => 'moduleaction',
-            'active' => 1
-        ]);
+        foreach ($modulesActions as $moduleAction) {
+            ModuleAction::create($moduleAction);
+        }
 
-        ModuleAction::create([
-            'action' => 'all',
-            'active' => 1
-        ]);
-        ModuleAction::create([
-            'action' => 'list',
-            'active' => 1
-        ]);
-        ModuleAction::create([
-            'action' => 'create',
-            'active' => 1
-        ]);
+        foreach ($abilities as $ability) {
+            Ability::create($ability);
+        }
 
-
-        Ability::create([
-            'module_id' => 1,
-            'module_action_id' => 1,
-            'ability' => '*',
-            'active' => 1,
-        ]);
-        Ability::create([
-            'module_id' => 2,
-            'module_action_id' => 2,
-            'ability' => 'module:list',
-            'active' => 1,
-        ]);
-        Ability::create([
-            'module_id' => 2,
-            'module_action_id' => 3,
-            'ability' => 'module:create',
-            'active' => 1,
-        ]);
-        Ability::create([
-            'module_id' => 3,
-            'module_action_id' => 2,
-            'ability' => 'moduleaction:list',
-            'active' => 1,
-        ]);
-        Ability::create([
-            'module_id' => 3,
-            'module_action_id' => 3,
-            'ability' => 'moduleaction:create',
-            'active' => 1,
-        ]);
-
-        UserGroupHasAbilities::create([
-            'user_group_id' => 1,
-            'ability_id' => 1
-        ]);
-        UserGroupHasAbilities::create([
-            'user_group_id' => 2,
-            'ability_id' => 2
-        ]);
-        UserGroupHasAbilities::create([
-            'user_group_id' => 2,
-            'ability_id' => 3
-        ]);
+        foreach ($userGroupHasAbilities as $userGroupHasAbility) {
+            UserGroupHasAbilities::create($userGroupHasAbility);
+        }
 
         $response = $this->postJson('/api/register', [
             'user_group_id' => 2,
@@ -132,5 +70,49 @@ class UserToPerformActionControllerTest extends TestCase
 
         $response->assertStatus(403);
         $this->assertEquals($expected, $jsonData);
+    }
+
+    public static function providerData ()
+    {
+        $userGroups = [
+            ['name' => 'superadmin', 'description' => 'Super Administrador', 'active' => 1],
+            ['name' => 'admin', 'description' => 'Administrador', 'active' => 1]
+        ];
+
+        $modules = [
+            ['name' => 'all', 'nickname' => 'All', 'description' => 'All', 'active' => 1],
+            ['name' => 'module', 'nickname' => 'module', 'description' => 'module', 'active' => 1],
+            ['name' => 'moduleaction', 'nickname' => 'moduleaction', 'description' => 'moduleaction', 'active' => 1]
+        ];
+
+        $modulesActions = [
+            [ 'action' => 'all', 'active' => 1],
+            [ 'action' => 'list', 'active' => 1],
+            [ 'action' => 'create', 'active' => 1]
+        ];
+
+        $abilities = [
+            [ 'module_id' => 1, 'module_action_id' => 1, 'ability' => '*', 'active' => 1],
+            [ 'module_id' => 2, 'module_action_id' => 2, 'ability' => 'module:list', 'active' => 1],
+            [ 'module_id' => 2, 'module_action_id' => 3, 'ability' => 'module:create', 'active' => 1],
+            [ 'module_id' => 3, 'module_action_id' => 2, 'ability' => 'moduleaction:list', 'active' => 1],
+            [ 'module_id' => 3, 'module_action_id' => 3, 'ability' => 'moduleaction:create', 'active' => 1]
+        ];
+
+        $userGroupHasAbilities = [
+            [ 'user_group_id' => 1, 'ability_id' => 1],
+            [ 'user_group_id' => 2, 'ability_id' => 2],
+            [ 'user_group_id' => 2, 'ability_id' => 3]
+        ];
+
+        return [
+            [
+                $userGroups,
+                $modules,
+                $modulesActions,
+                $abilities,
+                $userGroupHasAbilities
+            ]
+        ];
     }
 }
