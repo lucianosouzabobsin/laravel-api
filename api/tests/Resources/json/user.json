@@ -1,0 +1,14 @@
+[
+    {
+        "user_group_id": "1",
+        "name": "John Doe",
+        "email": "johndoe@example.com",
+        "password": "password"
+    },
+    {
+        "user_group_id": "2",
+        "name": "John Doe Junior",
+        "email": "johndoe2@example.com",
+        "password": "password"
+    }
+]

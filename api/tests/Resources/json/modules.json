@@ -1,0 +1,5 @@
+[
+    {"name":"all","nickname":"All","description":"All","active":1},
+    {"name":"module","nickname":"module","description":"module","active":1},
+    {"name":"moduleaction","nickname":"moduleaction","description":"moduleaction","active":1}
+]

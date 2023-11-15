@@ -1,0 +1,5 @@
+[
+    {"action":"all","active":1},
+    {"action":"list","active":1},
+    {"action":"create","active":1}
+]
