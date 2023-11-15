@@ -43,5 +43,7 @@ class Handler extends ExceptionHandler
                 'message' => 'You are not authorized to perform this action.'
             ], 403);
         }
+
+        return parent::render($request, $e);
     }
 }

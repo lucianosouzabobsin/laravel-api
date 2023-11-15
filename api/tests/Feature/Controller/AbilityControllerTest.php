@@ -222,8 +222,8 @@ class AbilityControllerTest extends TestCase
         $expected = [
             'result' => [
                 'new modules' => 6,
-                'new actions' => 3,
-                'new abilities' => 18
+                'new actions' => 4,
+                'new abilities' => 19
             ]
         ];
 

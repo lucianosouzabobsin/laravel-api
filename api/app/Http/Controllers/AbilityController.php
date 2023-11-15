@@ -106,7 +106,7 @@ class AbilityController extends Controller
         $contents = file_get_contents($path);
 
         // Use uma expressão regular para encontrar as palavras entre ->middleware(['auth:sanctum', 'abilities: e ']);
-        preg_match_all("/\->middleware\(\['auth:sanctum', 'abilities:(.*?)'\]\);/", $contents, $matches);
+        preg_match_all("/\->middleware\(\['auth:sanctum', 'ability:(.*?)'\]\);/", $contents, $matches);
 
         $newModules = 0;
         $newActions = 0;
