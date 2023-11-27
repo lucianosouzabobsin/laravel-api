@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Controller;
 
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use Tests\Utils\TestSetup;
 
@@ -327,6 +329,30 @@ class UserControllerTest extends TestCase
         ];
 
         $response->assertStatus(200);
+        $this->assertEquals($expected, $jsonData);
+    }
+
+
+    /**
+     * Testa a tentativa de acesso de um usuário para uma ação que ele não tem acesso.
+     *
+     * @return void
+     */
+    public function testUserNotAuthorizedToPerformAction()
+    {
+        $user = User::factory()->create();
+
+        Sanctum::actingAs($user, ['module:list']);
+
+        $response = $this->getJson('/api/module-action-list');
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $expected = [
+            "message" => "You are not authorized to perform this action."
+        ];
+
+        $response->assertStatus(403);
         $this->assertEquals($expected, $jsonData);
     }
 }

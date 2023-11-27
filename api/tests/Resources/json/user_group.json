@@ -1,0 +1,4 @@
+[
+    {"name":"superadmin","description":"Super Administrador","active":1},
+    {"name":"admin","description":"Administrador","active":1}
+]

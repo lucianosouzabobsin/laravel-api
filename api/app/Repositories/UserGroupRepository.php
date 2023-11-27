@@ -4,14 +4,17 @@ namespace App\Repositories;
 
 use App\Repositories\Contracts\UserGroupRepositoryInterface;
 use App\Models\UserGroup;
+use App\Services\DynamicQueryService;
 
 class UserGroupRepository implements UserGroupRepositoryInterface
 {
     protected $entity;
+    protected $dynamicQueryService;
 
-    public function __construct(UserGroup $entity)
+    public function __construct(UserGroup $entity, DynamicQueryService $dynamicQueryService)
     {
         $this->entity = $entity;
+        $this->dynamicQueryService = $dynamicQueryService;
     }
 
     /**
@@ -46,13 +49,25 @@ class UserGroupRepository implements UserGroupRepositoryInterface
     }
 
     /**
-     * Return all module
+     * List
      *
      * @return array
-     */
-    public function getAll()
+    */
+    public function list(array $filters, array $options)
     {
-        return $this->entity->all();
+        $query = $this->entity->query();
+        return $this->dynamicQueryService->buildQuery($query, $filters, $options)->get();
+    }
+
+    /**
+     * List Cunt
+     *
+     * @return array
+    */
+    public function count(array $filters)
+    {
+        $query = $this->entity->query();
+        return $this->dynamicQueryService->buildQuery($query, $filters)->count();
     }
 
     /**

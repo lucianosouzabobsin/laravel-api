@@ -14,7 +14,10 @@ class UserGroupController extends Controller
     protected $userGroupService;
     protected $userGroupHasAbilitiesService;
 
-    public function __construct(UserGroupService $userGroupService, UserGroupHasAbilitiesService $userGroupHasAbilitiesService)
+    public function __construct(
+        UserGroupService $userGroupService,
+        UserGroupHasAbilitiesService $userGroupHasAbilitiesService
+    )
     {
         $this->userGroupService = $userGroupService;
         $this->userGroupHasAbilitiesService = $userGroupHasAbilitiesService;
@@ -22,13 +25,19 @@ class UserGroupController extends Controller
 
 
     /**
-     * Return list Users Groups
+     * Handles List Request
      *
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function list()
+    public function list(Request $request)
     {
-        $modules = $this->userGroupService->getAll();
+        $inputs = $request->all();
+
+        $filters = isset($inputs['filters']) ? $inputs['filters'] : [];
+        $options = isset($inputs['options']) ? $inputs['options'] : [];
+
+        $modules = $this->userGroupService->list($filters, $options);
 
         return response()->json($modules, 201);
     }

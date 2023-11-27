@@ -23,9 +23,12 @@ class UserGroupService
      *
      * @return array
     */
-    public function getAll()
+    public function list(array $filters, array $options)
     {
-        return $this->userGroupRepository->getAll();
+        $data = $this->userGroupRepository->list($filters, $options);
+        $count = $this->userGroupRepository->count($filters);
+
+        return ['data' => $data, 'count' => $count];
     }
 
     /**
