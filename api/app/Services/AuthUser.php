@@ -82,7 +82,7 @@ class AuthUser
         return $user->createToken(
             $user->name.'_'.Carbon::now(),
             $userGroupAbilities,
-            Carbon::now()->addHour()
+            Carbon::now()->addHour(3)
         )->plainTextToken;
     }
 

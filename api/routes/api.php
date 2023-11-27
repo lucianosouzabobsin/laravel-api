@@ -31,6 +31,8 @@ Route::post('/register', [UserController::class, 'register'])
 Route::get('/user', [UserController::class, 'details'])
     ->middleware(['auth:sanctum', 'ability:user:details']);
 
+Route::get('/is-logged-in', [UserController::class, 'isLoggedIn']);
+
 #Module
 Route::get('/module-list', [ModuleController::class, 'list'])
     ->middleware(['auth:sanctum', 'ability:module:list']);
@@ -52,7 +54,7 @@ Route::post('/module-action-active', [ModuleActionController::class, 'active'])
     ->middleware(['auth:sanctum', 'ability:moduleaction:active']);
 
 #UserGroup
-Route::get('/user-group-list', [UserGroupController::class, 'list'])
+Route::post('/user-group-list', [UserGroupController::class, 'list'])
     ->middleware(['auth:sanctum', 'ability:usergroup:list']);
 Route::post('/user-group-create', [UserGroupController::class, 'create'])
     ->middleware(['auth:sanctum', 'ability:usergroup:create']);

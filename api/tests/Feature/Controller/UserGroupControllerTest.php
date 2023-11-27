@@ -34,13 +34,70 @@ class UserGroupControllerTest extends TestCase
     {
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $this->token,
-        ])->getJson('/api/user-group-list');
+        ])->postJson('/api/user-group-list');
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $size = count($jsonData);
+        $size = $jsonData['count'];
         $this->assertEquals($size, 3);
     }
+
+    /**
+     * Testa a list de grupos de usuários.
+     *
+     * @return void
+     */
+    public function testListwithFiltersEqualsAndOptionsUserGroup()
+    {
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->token,
+        ])->postJson('/api/user-group-list',  [
+            'filters' => [
+                [
+                    'field' => 'name',
+                    'operator' => '=',
+                    'value' => 'superadmin'
+                ]
+            ],
+            'options' => [
+                'sortBy' => ["name"],
+                'sortDirection' => ["asc"],
+                'perPage' => 2,
+                'page' => 1
+            ],
+        ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $size = $jsonData['count'];
+        $this->assertEquals($size, 1);
+    }
+
+    /**
+     * Testa a list de grupos de usuários.
+     *
+     * @return void
+     */
+    public function testListwithFiltersLikeAndOptionsUserGroup()
+    {
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->token,
+        ])->postJson('/api/user-group-list',  [
+            'filters' => [
+                [
+                    'field' => 'name',
+                    'operator' => 'like',
+                    'value' => 'admin'
+                ]
+            ],
+        ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $size = $jsonData['count'];
+        $this->assertEquals($size, 2);
+    }
+
 
     /**
      * Testa o registro de um novo grupo de usuario.
