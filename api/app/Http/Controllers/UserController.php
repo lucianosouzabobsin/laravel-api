@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Services\AuthUser;
 use App\Services\UserGroupHasAbilitiesService;
 use App\Services\UserGroupService;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -79,6 +80,20 @@ class UserController extends Controller
         } else {
             return response()->json(['error' => 'UnAuthorised'], 401);
         }
+    }
+
+    /**
+     * Returns Authenticated User isLoggedIn
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function isLoggedIn()
+    {
+        if (Auth::guard('sanctum')->check()) {
+            return response()->json(['message' =>  "Authenticated"], 200);
+        }
+
+        return response()->json(['message' =>  "Unauthenticated"], 401);
     }
 
     /**
