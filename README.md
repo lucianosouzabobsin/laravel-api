@@ -1,6 +1,6 @@
 # CONTROLE DE ACESSO
 
-Disponibiliza uma API REST que permite o cadastro de controle de acesso com grupos de usuários, módulos, ações e abilidades, somente com autorização token,
+Disponibiliza uma API REST que permite o cadastro de controle de acesso com grupos de usuários, módulos, ações e habilidades, somente com autorização token,
 com exceção do Login.
 
 ## Métodos
